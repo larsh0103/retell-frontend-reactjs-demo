@@ -9,10 +9,15 @@
     "@types/react": "^18.2.44",
     "@types/react-dom": "^18.2.17",
     "buffer": "^6.0.3",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "mediasource": "^2.4.0",
+    "node-fetch": "^3.3.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
     "retell-client-js-sdk": "^1.2.1",
+    "retell-sdk": "^3.5.0",
     "stream": "^0.0.2"
   },
   "devDependencies": {
