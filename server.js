@@ -9,7 +9,7 @@ const port = 8080;
 app.use(cors()); // Enable CORS for all routes
 app.use(bodyParser.json());
 
-const retell = new Retell({apiKey:""});
+const retell = new Retell({apiKey:});
 
 app.post('/register-call-on-your-server', async (req, res) => {
   try {
@@ -19,7 +19,8 @@ app.post('/register-call-on-your-server', async (req, res) => {
       audio_encoding: 's16le',
       audio_websocket_protocol: 'web',
       sample_rate: 16000,
-      end_call_after_silence_ms: 10000,
+      end_call_after_silence_ms: 20000,
+
     });
 
     res.json({

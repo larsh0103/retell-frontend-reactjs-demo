@@ -1,0 +1,76 @@
+function writeWAV(audioData, sampleRate) {
+  const buffer = new ArrayBuffer(44 + audioData.length * 2);
+  const view = new DataView(buffer);
+
+  // Write WAV header (RIFF header)
+  writeString(view, 0, 'RIFF');
+  view.setUint32(4, 36 + audioData.length * 2, true);
+  writeString(view, 8, 'WAVE');
+
+  // Write fmt subchunk
+  writeString(view, 12, 'fmt ');
+  view.setUint32(16, 16, true); // Subchunk1Size (16 for PCM)
+  view.setUint16(20, 1, true);  // AudioFormat (1 is PCM)
+  view.setUint16(22, 1, true);  // NumChannels
+  view.setUint32(24, sampleRate, true); // SampleRate
+  view.setUint32(28, sampleRate * 2, true); // ByteRate
+  view.setUint16(32, 2, true); // BlockAlign
+  view.setUint16(34, 16, true); // BitsPerSample
+
+  // Write data subchunk
+  writeString(view, 36, 'data');
+  view.setUint32(40, audioData.length * 2, true);
+
+  // Write the audio data
+  let offset = 44;
+  for (let i = 0; i < audioData.length; i++, offset += 2) {
+      const s = Math.max(-1, Math.min(1, audioData[i]));
+      view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+  }
+
+  return new Blob([view], { type: 'audio/wav' });
+
+  function writeString(view, offset, string) {
+      for (let i = 0; i < string.length; i++) {
+          view.setUint8(offset + i, string.charCodeAt(i));
+      }
+  }
+}
+
+
+
+
+const handleDownloadAudio = () => {
+    if (audioQueue.current.length > 0) {
+        // First calculate the total length of even indexed segments
+        let totalLength = 0;
+        audioQueue.current.forEach((segment, index) => {
+            if (index % 2 === 0) { // Only count even indexed segments
+                totalLength += segment.length;
+            }
+        });
+  
+        const combinedData = new Float32Array(totalLength);
+        let offset = 0;
+  
+        console.log("Queue Length:", audioQueue.current.length);
+        audioQueue.current.forEach((segment, index) => {
+            if (index % 2 === 0) { // Only process even indexed segments
+                console.log(`Segment ${index}: Length = ${segment.length}`);
+                combinedData.set(segment, offset);
+                offset += segment.length;
+            }
+        });
+  
+        console.log("sample rate", audioContext.current.sampleRate);
+        const blob = writeWAV(combinedData, 16000);
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'output.wav';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
+  };

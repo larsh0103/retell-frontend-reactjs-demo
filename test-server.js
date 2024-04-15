@@ -1,7 +1,7 @@
 async function testRegisterCall() {
     const fetch = (await import('node-fetch')).default;
     const url = 'http://localhost:8080/register-call-on-your-server';
-    const agentId = ''; // Use a valid agent ID for your test
+    const agentId = 'a3cfb6d7264592344634753c976bb05c'; // Use a valid agent ID for your test
 
     try {
         const response = await fetch(url, {
